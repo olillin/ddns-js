@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const LOG_FILE = '/var/log/ddns.log'
+const LOG_FILE = '/var/log/ddns-js.log'
 const log = (content) => {
     fs.writeFile(LOG_FILE, `${new Date().toLocaleString()}\n${content}`, () => {})
 }
