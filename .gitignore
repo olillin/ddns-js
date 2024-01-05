@@ -1,3 +1,7 @@
+# Local configuration
 .env
+config.json
+# Node
 node_modules/
+# Project files
 .vscode/

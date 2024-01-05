@@ -1,8 +1,41 @@
+const fs = require('fs')
+const Validator = require('jsonschema').Validator
 require('dotenv/config')
 
-const {API_TOKEN, RECORDS, REPEAT_MILLISECONDS} = process.env
-if (!API_TOKEN || !RECORDS) {
-    console.error('Missing required env variable')
+// Load environment variables
+const {API_TOKEN, REPEAT_MILLISECONDS} = process.env
+if (!API_TOKEN) {
+    console.error('Missing required env variable API_TOKEN')
+    process.exit()
+}
+
+// Read records from config.json
+let records = []
+
+var schema
+try {
+    schema = JSON.parse(fs.readFileSync('config.schema.json').toString())
+} catch {
+    console.warn('Failed to read schema, JSON validation skipped')
+}
+try {
+    const fileContent = fs.readFileSync('config.json')
+    const json = JSON.parse(fileContent.toString())
+    if (schema) {
+        const validator = new Validator()
+        const result = validator.validate(json, schema)
+        if (!result.valid) {
+            console.error("config.json is invalid, please make sure the file has the correct format as specified by config.schema.json\nErrors:\n" + result.errors.join('\n'))
+            process.exit()
+        }
+    }
+    if (Array.isArray(json.records)) {
+        records = json.records
+    } else {
+        records.push(json.records)
+    }
+} catch (e) {
+    console.error('Failed to read records from config.json\nError:' + e)
     process.exit()
 }
 
@@ -121,7 +154,7 @@ function checkDnsRecord(zone_id, dns_record_id, public_ip=null) {
 
 function checkRecord(record, public_ip=null) {
     return new Promise(resolve => {
-        const [zone_id, record_id] = record.split('/')
+        const {zone_id, record_id} = record
         if (!zone_id?.match(/^[a-z0-9]{32}$/)) {
             console.error(`Invalid zone id: ${zone_id}`)
             resolve(undefined)
@@ -140,40 +173,33 @@ function checkRecord(record, public_ip=null) {
 function checkRecords(records) {
     return new Promise(resolve => {
         console.log('\nChecking records...')
-        if (records.includes(',')) {
-            records = records.split(',')
-            getPublicIp().then(public_ip => {
-                if (!public_ip) {
-                    console.error('Failed to get public IP')
+        getPublicIp().then(public_ip => {
+            if (!public_ip) {
+                console.error('Failed to get public IP')
+                return
+            }
+            records.reverse()
+            function next() {
+                if (records.length == 0) {
+                    resolve(undefined)
                     return
                 }
-                records.reverse()
-                function next() {
-                    if (records.length == 0) {
-                        resolve(undefined)
-                        return
-                    }
-                    const record = records.pop()
-                    checkRecord(record, public_ip)
-                    .then(next)
-                }
-                next()
-            })
-        } else {
-            checkRecord(records).then(() => {
-                resolve(undefined)
-            })
-        }
+                const record = records.pop()
+                checkRecord(record, public_ip)
+                .then(next)
+            }
+            next()
+        })
     })
 }
 
 if (REPEAT_MILLISECONDS) {
     const repeat_milliseconds = parseInt(REPEAT_MILLISECONDS)
     function checkRecordsContinuous() {
-        checkRecords(RECORDS)
+        checkRecords(Array.from(records))
         setTimeout(checkRecordsContinuous, repeat_milliseconds)
     }
     checkRecordsContinuous()
 } else {
-    checkRecords(RECORDS)
+    checkRecords(Array.from(records))
 }
