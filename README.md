@@ -16,7 +16,7 @@ Example: `API_TOKEN=sWh9FHA5ow28zgdwTm8s4J0kUo8Td0imxhsNo9xJ`
 
 > Required: yes
 
-The [zone id](https://developers.cloudflare.com/api/operations/zones-get) and [record id](https://developers.cloudflare.com/api/operations/dns-records-for-a-zone-list-dns-records) of one or several DNS records. Zone id and record id are seperated by `/` and multiple records are seperated by `,`. Records are processed from left to right, waiting for the previous record to finish processing before continuing.
+The [zone id](https://developers.cloudflare.com/api/operations/zones-get) and [record id](https://developers.cloudflare.com/api/operations/dns-records-for-a-zone-list-dns-records) of one or several DNS records. Zone id and record id are separated by `/` and multiple records are separated by `,`. Records are processed from left to right, waiting for the previous record to finish processing before continuing.
 
 #### Format
 
