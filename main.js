@@ -45,11 +45,10 @@ function updateDnsRecord(zone_id, dns_record_id, data) {
 
 function getPublicIp() {
     return new Promise(resolve => {
-        fetch('http://icanhazip.com')
+        fetch('https://api.ipify.org')
         .then(response => response.text())
         .then(text => {
-            const ip = text.replace('\n', '')
-            resolve(ip)
+            resolve(text)
         })
     })
 }
