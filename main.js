@@ -3,7 +3,7 @@ const Validator = require('jsonschema').Validator
 require('dotenv/config')
 
 // Load environment variables
-const {API_TOKEN, REPEAT_MILLISECONDS} = process.env
+const { API_TOKEN, REPEAT_MILLISECONDS } = process.env
 if (!API_TOKEN) {
     console.error('Missing required env variable API_TOKEN')
     process.exit()
@@ -25,15 +25,11 @@ try {
         const validator = new Validator()
         const result = validator.validate(json, schema)
         if (!result.valid) {
-            console.error("config.json is invalid, please make sure the file has the correct format as specified by config.schema.json\nErrors:\n" + result.errors.join('\n'))
+            console.error('config.json is invalid, please make sure the file has the correct format as specified by config.schema.json\nErrors:\n' + result.errors.join('\n'))
             process.exit()
         }
     }
-    if (Array.isArray(json.records)) {
-        records = json.records
-    } else {
-        records.push(json.records)
-    }
+    records = json.records
 } catch (e) {
     console.error('Failed to read records from config.json\nError:' + e)
     process.exit()
@@ -48,19 +44,19 @@ function getDnsRecord(zone_id, dns_record_id) {
         const url = `https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records/${dns_record_id}`
         fetch(url, {
             headers: {
-                'Authorization': `Bearer ${API_TOKEN}`,
+                Authorization: `Bearer ${API_TOKEN}`,
                 'Content-Type': 'application/json',
-            }
+            },
         })
-        .then(response => response.json())
-        .then(json => {
-            if (!json.success) {
-                console.error(`Error occured while getting DNS record content:\n${formatErrors(json.errors)}\n`)
-                resolve(undefined)
-                return
-            }
-            resolve(json.result)
-        })
+            .then(response => response.json())
+            .then(json => {
+                if (!json.success) {
+                    console.error(`Error occured while getting DNS record content:\n${formatErrors(json.errors)}\n`)
+                    resolve(undefined)
+                    return
+                }
+                resolve(json.result)
+            })
     })
 }
 
@@ -69,7 +65,7 @@ function updateDnsRecord(zone_id, dns_record_id, data) {
     return fetch(url, {
         method: 'PUT',
         headers: {
-            'Authorization': `Bearer ${API_TOKEN}`,
+            Authorization: `Bearer ${API_TOKEN}`,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
@@ -79,17 +75,17 @@ function updateDnsRecord(zone_id, dns_record_id, data) {
 function getPublicIp() {
     return new Promise(resolve => {
         fetch('https://api.ipify.org')
-        .then(response => response.text())
-        .then(text => {
-            resolve(text)
-        })
+            .then(response => response.text())
+            .then(text => {
+                resolve(text)
+            })
     })
 }
 
-function checkDnsRecord(zone_id, dns_record_id, public_ip=null) {
+function checkDnsRecord(zone_id, dns_record_id, public_ip = null) {
     return new Promise(resolve => {
         console.log(`\nChecking DNS record ${zone_id}/${dns_record_id}`)
-    
+
         const promises = [getDnsRecord(zone_id, dns_record_id)]
         // Get public ip if none provided
         if (public_ip) {
@@ -97,11 +93,10 @@ function checkDnsRecord(zone_id, dns_record_id, public_ip=null) {
         } else {
             promises.push(getPublicIp())
         }
-    
-        Promise.all(promises)
-        .then(values => {
+
+        Promise.all(promises).then(values => {
             const [record, public_ip] = values
-    
+
             if (!public_ip) {
                 console.error('Failed to get public IP')
                 resolve(undefined)
@@ -120,7 +115,7 @@ function checkDnsRecord(zone_id, dns_record_id, public_ip=null) {
                 return
             }
             const record_ip = record.content
-        
+
             // Compare IP addresses
             console.log(`DNS record IP: ${record_ip}\nPublic IP:     ${public_ip}`)
             if (record_ip != public_ip) {
@@ -134,16 +129,16 @@ function checkDnsRecord(zone_id, dns_record_id, public_ip=null) {
                     tags: record.tags,
                     ttl: record.ttl,
                 })
-                .then(response => response.json())
-                .then(json => {
-                    if (!json.success) {
-                        console.log(`Failed to update DNS record:\n${formatErrors(json.errors)}`)
+                    .then(response => response.json())
+                    .then(json => {
+                        if (!json.success) {
+                            console.log(`Failed to update DNS record:\n${formatErrors(json.errors)}`)
+                            resolve(undefined)
+                            return
+                        }
+                        console.log(`DNS record has been updated, new IP: ${json.result.content}`)
                         resolve(undefined)
-                        return
-                    }
-                    console.log(`DNS record has been updated, new IP: ${json.result.content}`)
-                    resolve(undefined)
-                })
+                    })
             } else {
                 console.log('IP matches, no action has been taken')
                 resolve(undefined)
@@ -152,9 +147,9 @@ function checkDnsRecord(zone_id, dns_record_id, public_ip=null) {
     })
 }
 
-function checkRecord(record, public_ip=null) {
+function checkRecord(record, public_ip = null) {
     return new Promise(resolve => {
-        const {zone_id, record_id} = record
+        const { zone_id, record_id } = record
         if (!zone_id?.match(/^[a-z0-9]{32}$/)) {
             console.error(`Invalid zone id: ${zone_id}`)
             resolve(undefined)
@@ -165,8 +160,7 @@ function checkRecord(record, public_ip=null) {
             resolve(undefined)
             return
         }
-        checkDnsRecord(zone_id, record_id, public_ip)
-        .then(() => resolve(undefined))
+        checkDnsRecord(zone_id, record_id, public_ip).then(() => resolve(undefined))
     })
 }
 
@@ -185,8 +179,7 @@ function checkRecords(records) {
                     return
                 }
                 const record = records.pop()
-                checkRecord(record, public_ip)
-                .then(next)
+                checkRecord(record, public_ip).then(next)
             }
             next()
         })

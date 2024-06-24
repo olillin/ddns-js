@@ -3,18 +3,7 @@
     "type": "object",
     "properties": {
         "records": {
-            "type": ["array", "object"],
-            "properties": {
-                "zone_id": {
-                    "type": "string",
-                    "pattern": "^[a-z0-9]{32}$"
-                },
-                "record_id": {
-                    "type": "string",
-                    "pattern": "^[a-z0-9]{32}$"
-                }
-            },
-            "required": ["zone_id", "record_id"],
+            "type": ["array"],
             "additionalProperties": true,
             "items": {
                 "type": "object",
