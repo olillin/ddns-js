@@ -1,6 +1,5 @@
 const fs = require('fs')
 const Validator = require('jsonschema').Validator
-require('dotenv/config')
 
 // Load environment variables
 const { API_TOKEN, REPEAT_MILLISECONDS } = process.env
