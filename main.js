@@ -92,7 +92,7 @@ async function resolveRecords(records) {
 async function resolveName(name) {
     const zones = await cloudflare.getZones()
     const segments = name.split('.')
-    for (let i = -1; i > -segments.length; i--) {
+    for (let i = -1; i >= -segments.length; i--) {
         // Find domain
         const domain = segments.slice(i).join('.')
         const zone = zones.find(zone => zone.name === domain)?.id
