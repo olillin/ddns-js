@@ -1,6 +1,24 @@
 {
-  "main": "main.js",
-  "dependencies": {
-    "jsonschema": "^1.4.1"
-  }
+    "private": true,
+    "main": "bundle/main.js",
+    "type": "module",
+    "scripts": {
+        "build": "tsc && rolldown -c",
+        "start": "node .",
+        "lint": "oxlint",
+        "fmt": "oxfmt",
+        "fmt:check": "oxfmt --check"
+    },
+    "packageManager": "pnpm@10.28.0",
+    "dependencies": {
+        "jsonschema": "^1.4.1"
+    },
+    "devDependencies": {
+        "@types/node": "^25.5.0",
+        "oxfmt": "^0.42.0",
+        "oxlint": "^1.57.0",
+        "oxlint-tsgolint": "^0.17.3",
+        "rolldown": "1.0.0-rc.11",
+        "typescript": "^6.0.2"
+    }
 }

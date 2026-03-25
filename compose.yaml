@@ -1,0 +1,12 @@
+# This compose file is an example of how to run ddns-js in production using
+# the latest Docker image.
+name: ddns-js
+
+services:
+    app:
+        image: ghcr.io/olillin/ddns-js
+        restart: always
+        environment:
+            API_TOKEN:
+            REPEAT_MILLISECONDS: 60000
+        volumes: ./config.json:/app/config.json

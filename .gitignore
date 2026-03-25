@@ -3,5 +3,7 @@
 config.json
 # Node
 node_modules/
+dist/
+bundle/
 # Project files
 .vscode/
