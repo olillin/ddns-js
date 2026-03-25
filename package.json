@@ -1,4 +1,6 @@
 {
+    "name": "ddns-js",
+    "version": "1.0.0",
     "private": true,
     "main": "bundle/main.js",
     "type": "module",
