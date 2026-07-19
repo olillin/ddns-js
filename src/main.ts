@@ -4,7 +4,18 @@ import { Cloudflare } from './cloudflare.js'
 import path from 'path'
 
 // Load environment variables
-const { API_TOKEN, REPEAT_MILLISECONDS } = process.env
+const API_TOKEN =
+    process.env.API_TOKEN ??
+    (process.env.API_TOKEN_FILE
+        ? fs.readFileSync(process.env.API_TOKEN_FILE, 'utf-8')
+        : undefined)
+
+const REPEAT_MILLISECONDS =
+    process.env.REPEAT_MILLISECONDS ??
+    (process.env.REPEAT_MILLISECONDS_FILE
+        ? fs.readFileSync(process.env.REPEAT_MILLISECONDS_FILE, 'utf-8')
+        : undefined)
+
 if (!API_TOKEN) {
     console.error('Missing required env variable API_TOKEN')
     process.exit()
