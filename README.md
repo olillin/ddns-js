@@ -10,8 +10,6 @@ Automatically set CloudFlare [DNS records](https://www.cloudflare.com/en-gb/lear
 
 The [Cloudflare API token](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/) used for authorization.
 
-Example: `API_TOKEN=sWh9FHA5ow28zgdwTm8s4J0kUo8Td0imxhsNo9xJ`
-
 ### REPEAT_MILLISECONDS
 
 > Required: no
